@@ -49,7 +49,7 @@ func newController(name string, clientset kubernetes.Interface, informer informe
 }
 
 // Run controller worker which will handle events
-func (c *Controller) Run(stopCh <-chan struct{}) error {
+func (c *Controller) Run(stopCh <-chan struct{}) {
 	defer runtime.HandleCrash()
 	defer c.workqueue.ShutDown()
 
@@ -59,8 +59,6 @@ func (c *Controller) Run(stopCh <-chan struct{}) error {
 
 	<-stopCh
 	klog.Info("stop worker")
-
-	return nil
 }
 
 func (c *Controller) runWorker() {

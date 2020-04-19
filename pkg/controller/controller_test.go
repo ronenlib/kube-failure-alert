@@ -42,7 +42,6 @@ func newPod(name, namespace string, phase corev1.PodPhase) *corev1.Pod {
 }
 
 type fixture struct {
-	client          *fake.Clientset
 	controller      *Controller
 	handler         *MockHandler
 	informerFactory informers.SharedInformerFactory
@@ -66,7 +65,7 @@ func newFixture(handler MockHandler, pods ...*corev1.Pod) *fixture {
 	f.informerFactory.WaitForCacheSync(f.stopCh)
 
 	for _, p := range pods {
-		f.controller.informer.GetIndexer().Add(p)
+		_ = f.controller.informer.GetIndexer().Add(p)
 	}
 
 	return f
