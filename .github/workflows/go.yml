@@ -9,13 +9,16 @@ on:
 jobs:
 
   lint:
-    name: Lint
+    name: Format
     runs-on: ubuntu-latest
     steps:
 
     - uses: actions/checkout@v2
-    - name: Run golangci-lint
-      uses: actions-contrib/golangci-lint@v1
+    - name: Format
+      uses: grandcolline/golang-github-actions@v1.1.0
+      with:
+        run: fmt
+        token: ${{ secrets.GITHUB_TOKEN }}
 
   test:
     name: Test
@@ -64,5 +67,5 @@ jobs:
             dep ensure
         fi
 
-    - name: Test
+    - name: Build
       run: go build -v .
