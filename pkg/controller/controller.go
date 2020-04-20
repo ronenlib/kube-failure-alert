@@ -15,17 +15,19 @@ import (
 	"k8s.io/klog"
 )
 
+const maxRetries = 3
+
 // Controller implement the logic of kube object notifier
 type Controller struct {
 	name          string
 	kubeClientset kubernetes.Interface
 	informer      cache.SharedIndexInformer
-	lister        listers.PodLister
+	lister        listers.EventLister
 	workqueue     workqueue.RateLimitingInterface
 	handler       handler.Handler
 }
 
-func newController(name string, clientset kubernetes.Interface, informer informers.PodInformer, handler handler.Handler) *Controller {
+func newController(name string, clientset kubernetes.Interface, informer informers.EventInformer, handler handler.Handler) *Controller {
 	defaultQueue := workqueue.DefaultControllerRateLimiter()
 	queueName := fmt.Sprintf("kube-failure-alert-%s", name)
 	queue := workqueue.NewNamedRateLimitingQueue(defaultQueue, queueName)
@@ -40,8 +42,8 @@ func newController(name string, clientset kubernetes.Interface, informer informe
 	}
 
 	c.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		UpdateFunc: func(old, new interface{}) {
-			c.enqueueEvent(new)
+		AddFunc: func(obj interface{}) {
+			c.enqueueEvent(obj)
 		},
 	})
 
@@ -90,15 +92,15 @@ func (c *Controller) processNextWorkItem() (bool, error) {
 
 	err := c.handleKey(key)
 
-	if err != nil {
+	if err == nil {
+		klog.Infof("Successfully handeled %s", key)
+	} else if c.workqueue.NumRequeues(obj) < maxRetries  {
+		klog.Infof("Failed to handel %s, sending back to queue", key)
 		c.workqueue.AddRateLimited(obj)
-		return true, err
 	}
 
-	klog.Infof("Successfully handeled %s", key)
 	c.workqueue.Forget(obj)
-
-	return true, nil
+	return true, err
 }
 
 func (c *Controller) handleKey(key string) error {
@@ -108,7 +110,7 @@ func (c *Controller) handleKey(key string) error {
 		return err
 	}
 
-	obj, err := c.lister.Pods(namespace).Get(name)
+	obj, err := c.lister.Events(namespace).Get(name)
 
 	if err != nil {
 		return err
