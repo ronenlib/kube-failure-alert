@@ -94,7 +94,7 @@ func (c *Controller) processNextWorkItem() (bool, error) {
 
 	if err == nil {
 		klog.Infof("Successfully handeled %s", key)
-	} else if c.workqueue.NumRequeues(obj) < maxRetries  {
+	} else if c.workqueue.NumRequeues(obj) < maxRetries {
 		klog.Infof("Failed to handel %s, sending back to queue", key)
 		c.workqueue.AddRateLimited(obj)
 	}

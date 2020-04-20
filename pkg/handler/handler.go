@@ -14,7 +14,7 @@ type Handler interface {
 
 // EventHandler handels incoming events and notifies when
 // an event is alerting
-type EventHandler struct{
+type EventHandler struct {
 	notifier notifier.Notifier
 }
 
