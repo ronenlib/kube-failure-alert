@@ -3,7 +3,6 @@ module github.com/ronenlib/kube-event-alert
 go 1.13
 
 require (
-	github.com/ronenlib/kube-failure-alert v0.0.0-20200420225327-23be62c3d071 // indirect
 	k8s.io/api v0.18.0
 	k8s.io/apimachinery v0.18.0
 	k8s.io/client-go v0.18.0
