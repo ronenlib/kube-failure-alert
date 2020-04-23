@@ -114,13 +114,14 @@ func TestControllerProcessItem(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			f.controller.workqueue.Add(tc.key)
 			result, err := f.controller.processNextWorkItem()
+			receivedErr := err != nil
 
 			if result != tc.expectedResult {
 				t.Errorf("Expected return value to be %v, got %v", tc.expectedResult, result)
 			}
 
-			if err != nil && !tc.expectError {
-				t.Error("Expected error")
+			if receivedErr != tc.expectError {
+				t.Errorf("Expected error to be %v but received error was %v", tc.expectError, receivedErr)
 			}
 		})
 	}
@@ -170,9 +171,10 @@ func TestControllerHandelKey(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 			err := f.controller.handleKey(tc.key)
+			receivedErr := err != nil
 
-			if err != nil && !tc.expectError {
-				t.Error("Expected error")
+			if receivedErr != tc.expectError {
+				t.Errorf("Expected error to be %v but received error was %v", tc.expectError, receivedErr)
 			}
 		})
 	}

@@ -3,7 +3,7 @@ package handler
 import (
 	"fmt"
 
-	"github.com/ronenlib/kube-failure-alert/pkg/notifier"
+	"github.com/ronenlib/kube-event-alert/pkg/notifier"
 	corev1 "k8s.io/api/core/v1"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ronenlib/kube-failure-alert/pkg/handler"
+	"github.com/ronenlib/kube-event-alert/pkg/handler"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	informers "k8s.io/client-go/informers/core/v1"
@@ -29,7 +29,7 @@ type Controller struct {
 
 func newController(name string, clientset kubernetes.Interface, informer informers.EventInformer, handler handler.Handler) *Controller {
 	defaultQueue := workqueue.DefaultControllerRateLimiter()
-	queueName := fmt.Sprintf("kube-failure-alert-%s", name)
+	queueName := fmt.Sprintf("kube-event-alert-%s", name)
 	queue := workqueue.NewNamedRateLimitingQueue(defaultQueue, queueName)
 
 	c := &Controller{

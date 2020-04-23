@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ronenlib/kube-failure-alert/pkg/notifier"
+	"github.com/ronenlib/kube-event-alert/pkg/notifier"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -43,41 +43,53 @@ func newEvent(eventType string) *corev1.Event {
 	}
 }
 
+func getExpectedPayload() notifier.Payload {
+	return notifier.Payload{
+		Kind:      "kind",
+		Namespace: "namespace",
+		Name:      "name",
+		Error:     "reason message",
+	}
+}
+
 func TestHandle(t *testing.T) {
 	cases := []struct {
-		notifier          *mockNotifier
-		arg               interface{}
-		notifierTriggered bool
-		expectError       bool
-		name              string
+		notifier           *mockNotifier
+		arg                interface{}
+		expectNotifierCall bool
+		expectPayload      notifier.Payload
+		expectError        bool
+		name               string
 	}{
 		{
-			notifier:          newMockNotifier(false),
-			arg:               newEvent(corev1.EventTypeNormal),
-			notifierTriggered: false,
-			expectError:       false,
-			name:              "NormalEvent",
+			notifier:           newMockNotifier(false),
+			arg:                newEvent(corev1.EventTypeNormal),
+			expectNotifierCall: false,
+			expectError:        false,
+			name:               "NormalEvent",
 		},
 		{
-			notifier:          newMockNotifier(false),
-			arg:               newEvent(corev1.EventTypeWarning),
-			notifierTriggered: true,
-			expectError:       false,
-			name:              "WarningEvent",
+			notifier:           newMockNotifier(false),
+			arg:                newEvent(corev1.EventTypeWarning),
+			expectNotifierCall: true,
+			expectPayload:      getExpectedPayload(),
+			expectError:        false,
+			name:               "WarningEvent",
 		},
 		{
-			notifier:          newMockNotifier(false),
-			arg:               struct{}{},
-			notifierTriggered: false,
-			expectError:       true,
-			name:              "BadType",
+			notifier:           newMockNotifier(false),
+			arg:                struct{}{},
+			expectNotifierCall: false,
+			expectError:        true,
+			name:               "BadType",
 		},
 		{
-			notifier:          newMockNotifier(true),
-			arg:               newEvent(corev1.EventTypeWarning),
-			notifierTriggered: true,
-			expectError:       true,
-			name:              "ErrorNotifier",
+			notifier:           newMockNotifier(true),
+			arg:                newEvent(corev1.EventTypeWarning),
+			expectNotifierCall: true,
+			expectPayload:      getExpectedPayload(),
+			expectError:        true,
+			name:               "ErrorNotifier",
 		},
 	}
 
@@ -85,16 +97,19 @@ func TestHandle(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			h := NewEventHandler(tc.notifier)
 			err := h.Handle(tc.arg)
+			receivedErr := err != nil
 
-			if err != nil && !tc.expectError {
-				t.Error("Expected error")
+			if receivedErr != tc.expectError {
+				t.Errorf("Expected error to be %v but received error was %v", tc.expectError, receivedErr)
 			}
 
-			if tc.notifierTriggered && tc.notifier.lastReceived == (notifier.Payload{}) {
-				t.Error("Expected notifier to be triggered")
+			notifierCalled := tc.notifier.lastReceived == (notifier.Payload{})
+
+			if tc.expectNotifierCall == notifierCalled {
+				t.Errorf("Expected notifier called to be %v but got %v", tc.expectNotifierCall, notifierCalled)
 			}
 
-			if tc.notifierTriggered && reflect.DeepEqual(tc.notifier.lastReceived, tc.arg) {
+			if tc.expectNotifierCall && !reflect.DeepEqual(tc.notifier.lastReceived, tc.expectPayload) {
 				t.Error("Notifier was triggered with wrong payload")
 			}
 		})

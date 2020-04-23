@@ -1,26 +1,19 @@
 package controller
 
 import (
-	"github.com/ronenlib/kube-failure-alert/pkg/handler"
-	"github.com/ronenlib/kube-failure-alert/pkg/notifier"
+	"github.com/ronenlib/kube-event-alert/pkg/handler"
+	"github.com/ronenlib/kube-event-alert/pkg/notifier"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/klog"
 )
 
-// todo remove fake notifier
-type fakeNotifier struct{}
-
-func (f fakeNotifier) Notify(payload notifier.Payload) error {
-	return nil
-}
-
 // Launch creates and executes controller
-func Launch(clientset kubernetes.Interface, stopCh <-chan struct{}) {
+func Launch(clientset kubernetes.Interface, notifier notifier.SlackNotifier, stopCh <-chan struct{}) {
 	factory := informers.NewSharedInformerFactory(clientset, 0)
 	informer := factory.Core().V1().Events()
 
-	eventHandler := handler.NewEventHandler(fakeNotifier{})
+	eventHandler := handler.NewEventHandler(notifier)
 
 	c := newController("event", clientset, informer, eventHandler)
 
