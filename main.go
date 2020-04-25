@@ -1,30 +1,24 @@
 package main
 
 import (
-	"flag"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/ronenlib/kube-event-alert/config"
 	"github.com/ronenlib/kube-event-alert/pkg/controller"
 	"github.com/ronenlib/kube-event-alert/pkg/notifier"
 	"github.com/ronenlib/kube-event-alert/pkg/util"
 	"k8s.io/klog"
 )
 
-var (
-	kubeconfig string
-	masterURL  string
-	webhookURL string
-)
-
 func main() {
 	klog.InitFlags(nil)
-	flag.Parse()
 
-	clientset := util.GetKubeClient(masterURL, kubeconfig)
-	// todo remvoe url
-	notifier := notifier.NewSlackNotifier(webhookURL)
+	config := config.Load()
+
+	clientset := util.GetKubeClient(config.MasterURL, config.Kubeconfig)
+	notifier := notifier.NewSlackNotifier(config.WebhookURL)
 
 	stopCh := make(chan struct{})
 	setInterrupt(stopCh)
@@ -43,10 +37,4 @@ func setInterrupt(stopCh chan struct{}) {
 		<-interrupt
 		os.Exit(1)
 	}()
-}
-
-func init() {
-	flag.StringVar(&kubeconfig, "kubeconfig", "", "path to a kubeconfig if running out of cluster")
-	flag.StringVar(&masterURL, "masterUrl", "", "url to kube cluster if running out of cluster")
-	flag.StringVar(&webhookURL, "webhookURL", "", "notification will be sent to this slack incoming webhook url")
 }

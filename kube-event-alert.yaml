@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kube-event-alert
+  namespace: default
+spec:
+  containers:
+  - image: ronenlib/kube-event-alert:1.0.0
+    imagePullPolicy: Always
+    name: kube-event-alert
+    env:
+      - name: WEBHOOK_URL
+        valueFrom:
+          configMapKeyRef:
+              name: kube-event-alert
+              key: webhook.url
+  restartPolicy: Always

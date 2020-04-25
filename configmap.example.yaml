@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-event-alert
+  namespace: default
+data:
+  webhook.url: <webhook-url>
