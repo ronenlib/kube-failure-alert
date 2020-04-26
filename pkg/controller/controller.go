@@ -95,6 +95,7 @@ func (c *Controller) processNextWorkItem() (bool, error) {
 	} else {
 		klog.Infof("Failed to handel %s, sending back to queue", key)
 		c.workqueue.AddRateLimited(obj)
+		return true, err
 	}
 
 	c.workqueue.Forget(obj)
