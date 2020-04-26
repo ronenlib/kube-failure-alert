@@ -25,7 +25,7 @@ func Load() Config {
 		"url to kube cluster if running out of cluster"+
 			"Can be specified with KUBE_MASTER_URL environment variable as well")
 	flag.StringVar(&c.WebhookURL, "webhookURL", c.WebhookURL,
-		"notification will be sent to this slack incoming webhook url."+
+		"notification will be sent to this webhook url."+
 			"Can be specified with WEBHOOK_URL environment variable as well")
 	flag.Parse()
 

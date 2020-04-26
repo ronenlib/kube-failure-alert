@@ -18,7 +18,7 @@ func main() {
 	config := config.Load()
 
 	clientset := util.GetKubeClient(config.MasterURL, config.Kubeconfig)
-	notifier := notifier.NewSlackNotifier(config.WebhookURL)
+	notifier := notifier.NewWebhookNotifier(config.WebhookURL)
 
 	stopCh := make(chan struct{})
 	setInterrupt(stopCh)

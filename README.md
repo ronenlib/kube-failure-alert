@@ -14,7 +14,7 @@ OPTIONS:
     url to kube cluster if running out of cluster
     can be specified with KUBE_MASTER_URL environment variable as well
 -webhookURL
-    notification will be sent to this slack incoming webhook url
+    notification will be sent to this incoming webhook url
     can be specified with WEBHOOK_URL environment variable as well
 ```
 

@@ -9,7 +9,7 @@ import (
 )
 
 // Launch creates and executes controller
-func Launch(clientset kubernetes.Interface, notifier notifier.SlackNotifier, stopCh <-chan struct{}) {
+func Launch(clientset kubernetes.Interface, notifier notifier.WebhookNotifier, stopCh <-chan struct{}) {
 	factory := informers.NewSharedInformerFactory(clientset, 0)
 	informer := factory.Core().V1().Events()
 

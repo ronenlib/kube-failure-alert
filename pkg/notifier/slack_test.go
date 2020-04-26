@@ -8,13 +8,13 @@ import (
 	"testing"
 )
 
-type slackRequest struct {
+type webhookRequest struct {
 	Text string `json:"text"`
 }
 
-var body slackRequest
+var body webhookRequest
 
-func setSlackBody(req *http.Request) {
+func setWebhookBody(req *http.Request) {
 	err := json.NewDecoder(req.Body).Decode(&body)
 
 	if err != nil {
@@ -23,13 +23,13 @@ func setSlackBody(req *http.Request) {
 }
 
 func fakeOkHandler(w http.ResponseWriter, req *http.Request) {
-	setSlackBody(req)
+	setWebhookBody(req)
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "ok")
 }
 
 func fakeBadMessageHandler(w http.ResponseWriter, req *http.Request) {
-	setSlackBody(req)
+	setWebhookBody(req)
 	w.WriteHeader(http.StatusBadRequest)
 	fmt.Fprintf(w, "error")
 }
@@ -65,9 +65,9 @@ func TestNotify(t *testing.T) {
 			server := httptest.NewServer(tc.handler)
 			defer server.Close()
 
-			sn := NewSlackNotifier(server.URL)
+			sn := NewWebhookNotifier(server.URL)
 
-			body = slackRequest{} // reset variable
+			body = webhookRequest{} // reset variable
 			err := sn.Notify(tc.payload)
 			receivedErr := err != nil
 

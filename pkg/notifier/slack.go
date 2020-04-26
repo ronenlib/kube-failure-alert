@@ -10,21 +10,21 @@ import (
 
 const contentType = "application/json"
 
-// SlackNotifier sends notifications to slack
-type SlackNotifier struct {
+// WebhookNotifier sends notifications to webhook
+type WebhookNotifier struct {
 	webhookURL string
 }
 
-// NewSlackNotifier creates new slack notifier
-func NewSlackNotifier(webhookURL string) SlackNotifier {
-	return SlackNotifier{
+// NewWebhookNotifier creates new webhook notifier
+func NewWebhookNotifier(webhookURL string) WebhookNotifier {
+	return WebhookNotifier{
 		webhookURL: webhookURL,
 	}
 }
 
 // Notify convers payload to a readable message
-// and sends it to slack webhook url
-func (sn SlackNotifier) Notify(payload Payload) error {
+// and sends it to webhook webhook url
+func (sn WebhookNotifier) Notify(payload Payload) error {
 	reader, err := sn.toReader(payload)
 
 	if err != nil {
@@ -38,13 +38,13 @@ func (sn SlackNotifier) Notify(payload Payload) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Failed to send slack notification, status %d", resp.StatusCode)
+		return fmt.Errorf("Failed to send notification to webhook, status %d", resp.StatusCode)
 	}
 
 	return nil
 }
 
-func (sn SlackNotifier) toReader(payload Payload) (io.Reader, error) {
+func (sn WebhookNotifier) toReader(payload Payload) (io.Reader, error) {
 	text := fmt.Sprintf("%s %s/%s - %s", payload.Kind, payload.Namespace, payload.Name, payload.Error)
 
 	var body = map[string]string{
