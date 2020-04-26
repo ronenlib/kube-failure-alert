@@ -1,7 +1,5 @@
 # KUBE EVENT ALERT
 
----
-
 Kube event alert is a k8s controller that watches for events in the cluster and alerts about any abnormal events by calling a webhook with the event details. The webhook payload support slack incoming webhook payload. The controller can run both in and out of the k8s cluster.
 
 ## Usage
