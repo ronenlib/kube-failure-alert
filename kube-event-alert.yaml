@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   containers:
-  - image: ronenlib/kube-event-alert:1.0.0
+  - image: ronenlib/kube-event-alert:1.0.1
     imagePullPolicy: Always
     name: kube-event-alert
     env:
