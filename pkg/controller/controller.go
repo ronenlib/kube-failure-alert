@@ -15,8 +15,6 @@ import (
 	"k8s.io/klog"
 )
 
-const maxRetries = 3
-
 // Controller implement the logic of kube object notifier
 type Controller struct {
 	name          string
@@ -94,7 +92,7 @@ func (c *Controller) processNextWorkItem() (bool, error) {
 
 	if err == nil {
 		klog.Infof("Successfully handeled %s", key)
-	} else if c.workqueue.NumRequeues(obj) < maxRetries {
+	} else {
 		klog.Infof("Failed to handel %s, sending back to queue", key)
 		c.workqueue.AddRateLimited(obj)
 	}
